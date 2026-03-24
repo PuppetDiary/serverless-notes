@@ -78,20 +78,22 @@ function NewNoteForm() {
         return
       }
 
-      // 确保 profile 记录存在
-      const { data: existingProfile } = await supabase
+      // 使用 upsert 确保 profile 记录存在
+      const { error: profileError } = await supabase
         .from('profiles')
-        .select('id')
-        .eq('id', user.id)
-        .single()
-
-      if (!existingProfile) {
-        // 创建 profile 记录
-        await supabase.from('profiles').insert({
+        .upsert({
           id: user.id,
           username: user.email?.split('@')[0] || 'user',
           avatar_url: user.user_metadata?.avatar_url || null,
+        }, {
+          onConflict: 'id',
+          ignoreDuplicates: false
         })
+
+      if (profileError) {
+        setError(`创建用户资料失败: ${profileError.message}`)
+        setSaving(false)
+        return
       }
 
       const { data, error: insertError } = await supabase
