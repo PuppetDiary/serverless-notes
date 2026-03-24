@@ -2,6 +2,10 @@
 
 ## 部署到 Vercel
 
+### ⚠️ 重要提示
+
+`vercel.json` 文件中**不应该**包含 `env` 配置块。环境变量必须在 Vercel Dashboard 中手动配置，而不是通过 `@secret-name` 语法引用。
+
 ### 前置准备
 
 1. **GitHub 账号**：确保代码已推送到 GitHub 仓库
@@ -23,10 +27,26 @@
 
 3. **配置环境变量**
    在 "Environment Variables" 部分添加以下变量：
-   ```
-   NEXT_PUBLIC_SUPABASE_URL=你的Supabase项目URL
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=你的Supabase匿名密钥
-   ```
+   
+   **重要提示**：直接粘贴实际的值，不要使用 Secret 引用！
+   
+   **如何添加**：
+   - 点击 "Add New" 按钮
+   - **Name**: `NEXT_PUBLIC_SUPABASE_URL`
+   - **Value**: 粘贴您的 Supabase URL（例如 `https://xxxx.supabase.co`）
+   - **Environments**: 勾选 Production, Preview, Development
+   - 点击 "Save"
+   
+   - 再次点击 "Add New" 按钮
+   - **Name**: `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - **Value**: 粘贴您的 Supabase Anon Key（一长串以 `eyJ` 开头的字符串）
+   - **Environments**: 勾选 Production, Preview, Development
+   - 点击 "Save"
+   
+   **从哪里获取这些值**：
+   - 打开本地的 `.env.local` 文件
+   - 复制 `NEXT_PUBLIC_SUPABASE_URL=` 后面的值
+   - 复制 `NEXT_PUBLIC_SUPABASE_ANON_KEY=` 后面的值
 
 4. **部署**
    - 点击 "Deploy" 按钮
