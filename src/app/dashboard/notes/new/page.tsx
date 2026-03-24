@@ -78,6 +78,22 @@ function NewNoteForm() {
         return
       }
 
+      // 确保 profile 记录存在
+      const { data: existingProfile } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', user.id)
+        .single()
+
+      if (!existingProfile) {
+        // 创建 profile 记录
+        await supabase.from('profiles').insert({
+          id: user.id,
+          username: user.email?.split('@')[0] || 'user',
+          avatar_url: user.user_metadata?.avatar_url || null,
+        })
+      }
+
       const { data, error: insertError } = await supabase
         .from('notes')
         .insert({

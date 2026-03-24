@@ -8,8 +8,25 @@ export async function GET(request: Request) {
 
   if (code) {
     const supabase = await createClient()
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
-    if (!error) {
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code)
+    
+    if (!error && data.user) {
+      // 确保 profile 记录存在
+      const { data: existingProfile } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', data.user.id)
+        .single()
+
+      if (!existingProfile) {
+        // 创建 profile 记录
+        await supabase.from('profiles').insert({
+          id: data.user.id,
+          username: data.user.email?.split('@')[0] || 'user',
+          avatar_url: data.user.user_metadata?.avatar_url || null,
+        })
+      }
+      
       return NextResponse.redirect(`${origin}${next}`)
     }
   }
